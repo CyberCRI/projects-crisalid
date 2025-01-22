@@ -1,6 +1,3 @@
-[submodule "crisalid-ikg"]
-	path = crisalid-ikg
-	url = git@github.com:CRISalid-esr/crisalid-ikg.git
 [submodule "crisalid-apollo"]
 	path = crisalid-apollo
 	url = git@github.com:CRISalid-esr/crisalid-apollo.git
