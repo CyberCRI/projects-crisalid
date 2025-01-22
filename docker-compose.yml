@@ -1,0 +1,195 @@
+services:
+  crisalid-apollo:
+    container_name: crisalid-apollo
+    build:
+      context: ./crisalid-apollo
+      dockerfile: Dockerfile
+      target: builder
+    ports:
+        - 4000:4000
+    restart: always
+    command: npm run dev
+    env_file:
+      - .env
+  neo4j:
+    image: neo4j:5-community
+    container_name: neo4j
+    ports:
+      - 7474:7474
+      - 7687:7687
+    environment:
+      - NEO4J_AUTH=neo4j/password
+      - NEO4J_AUTH=none
+      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_apoc_import_file_use__neo4j__config=true
+      - NEO4JLABS_PLUGINS=["apoc"]
+    volumes:
+      - neo4j-data:/data
+      - neo4j-logs:/logs
+      - neo4j-import:/import
+      - neo4j-backups:/backups
+      - neo4j-plugins:/plugins
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+#   projects-backend:
+#     container_name: projects-backend
+#     build:
+#       context: ./projects-backend
+#       args:
+#         EXPORT_FLAG: --dev
+#     ports:
+#         - "8000:8000"
+#     depends_on:
+#       - postgres
+#       - keycloak
+#     restart: always
+#     command: uvicorn projects.asgi:application --host 0.0.0.0 --port 8001 --reload
+#     environment:
+#       DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE}
+#     env_file:
+#         - .env
+#     volumes:
+#       - ./projects-backend:/app
+#   postgres:
+#     image: pgvector/pgvector:pg14
+#     user: postgres
+#     ports:
+#       - 5432:5432
+#     volumes:
+#       - postgres-data:/var/lib/postgresql/data
+#     environment:
+#       - POSTGRES_PASSWORD=password
+#       - POSTGRES_EXTENSIONS=pg_trgm, unaccent
+#     healthcheck:
+#       test: ["CMD", "pg_isready"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+
+#   minio:
+#     image: quay.io/minio/minio
+#     ports:
+#       - 9000:9000
+#       - 9001:9001
+#     entrypoint:
+#       - /usr/bin/bash
+#       - -c
+#     command:
+#       # Create the bucket projects before starting minio
+#       - mkdir -p /data/projects && minio server --console-address :9001 /data
+#     volumes:
+#       - s3:/data
+
+#   redis:
+#     image: redis:6.2-bullseye
+#     command:
+#       # Enable persistence
+#       - redis-server
+#       - --save
+#       - "60"
+#       - "1"
+#       - --loglevel
+#       - warning
+#     ports:
+#       - 6379:6379
+#     volumes:
+#       - projects-backend-redis:/data
+
+#   celery:
+#     build: ./projects-backend
+#     command: celery -A projects worker -B -l info
+#     restart: always
+#     depends_on:
+#       - projects-backend
+#       - redis
+#     environment:
+#       DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE}
+#     env_file:
+#         - .env
+
+#   mailhog:
+#     image: mailhog/mailhog
+#     ports:
+#       - 1025:1025
+#       - 8025:8025
+
+#   mjml:
+#     image: danihodovic/mjml-server
+#     ports:
+#       - 15500:15500
+
+#   keycloak:
+#     build:
+#       context: ./keycloak-lpi-theme/theme
+#       dockerfile: Dockerfile
+#     ports:
+#       - 8001:8080
+#     environment:
+#       - KEYCLOAK_ADMIN=admin
+#       - KEYCLOAK_ADMIN_PASSWORD=admin
+#       - PROJECT_API_URL=http://localhost:8000
+
+#     healthcheck:
+#       test: ["CMD", "curl", "-LIsSfo", "/dev/null", "http://127.0.0.1:8080/realms/lp/.well-known/openid-configuration"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+#       start_period: 30s
+
+#     command:
+#       - start-dev
+#       - --import-realm
+#       - --spi-theme-static-max-age=-1
+#       - --spi-theme-cache-themes=false
+#       - --spi-theme-cache-templates=false
+
+#     volumes:
+#       - ./keycloak-lpi-theme/theme/src/main/resources/theme/:/opt/keycloak/themes
+#   opensearch-node:
+#     image: opensearchproject/opensearch:latest
+#     container_name: opensearch-node
+#     environment:
+#       cluster.name: opensearch-cluster
+#       node.name: opensearch-node
+#       bootstrap.memory_lock: true
+#       OPENSEARCH_JAVA_OPTS: -Xms1024m -Xmx1024m
+#       DISABLE_INSTALL_DEMO_CONFIG: true
+#       DISABLE_SECURITY_PLUGIN: true
+#       discovery.type: single-node
+#       logger.org.opensearch: ERROR
+#       cluster.routing.allocation.disk.watermark.flood_stage: 100%
+#     ulimits:
+#       memlock:
+#         soft: -1
+#         hard: -1
+#       nofile:
+#         soft: 65536
+#         hard: 65536
+#     volumes:
+#       - opensearch-data:/usr/share/opensearch/data
+#     ports:
+#       - 9200:9200
+#       - 9600:9600
+
+volumes:
+  neo4j-data:
+  neo4j-logs:
+  neo4j-import:
+  neo4j-backups:
+  neo4j-plugins:
+  rabbitmq-data:
+  # opensearch-data:
+  # projects-backend-redis:
+  # postgres-data:
+  # s3:
