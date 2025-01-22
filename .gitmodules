@@ -1,0 +1,9 @@
+[submodule "crisalid-ikg"]
+	path = crisalid-ikg
+	url = git@github.com:CRISalid-esr/crisalid-ikg.git
+[submodule "crisalid-apollo"]
+	path = crisalid-apollo
+	url = git@github.com:CRISalid-esr/crisalid-apollo.git
+[submodule "projects-backend"]
+	path = projects-backend
+	url = git@github.com:CyberCRI/projects-backend.git
