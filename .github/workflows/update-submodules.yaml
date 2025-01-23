@@ -1,0 +1,42 @@
+name: Update Submodules
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  update-submodules:
+    permissions:                # Job-level permissions configuration starts here
+      contents: write           # 'write' access to repository contents
+      pull-requests: write      # 'write' access to pull requests
+    runs-on: ubuntu-latest
+    steps:
+    - name: '[SUBMODULES] Obtain GitHub App Installation Access Token'
+      uses: Nastaliss/get-github-app-pat@v1
+      id: githubAppAuth
+      with:
+        app-id: ${{ secrets.RW_TOKEN_GENERATOR_APP_ID }}
+        app-installation-id: ${{ secrets.RW_TOKEN_GENERATOR_APP_INSTALLATION_ID }}
+        app-private-key: ${{ secrets.RW_TOKEN_GENERATOR_APP_PRIVATE_KEY }}
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        token: ${{ steps.githubAppAuth.outputs.access-token }}
+        submodules: 'recursive'
+        fetch-depth: 0
+    - name: Update runner version
+      run: |
+        git submodule foreach 'git checkout main && git pull --recurse-submodule'
+    - name: Commit changes
+      run: |
+        # from https://github.com/orgs/community/discussions/26560
+        git config user.email "it-team@learningplanetinstitute.org"
+        git config user.name "Infra bot"
+        git add .
+
+        if ! git diff-index --quiet HEAD; then
+            git commit -m "Update submodules to latest main changes"
+            git push
+        else
+            echo "No changes to commit"
+        fi
