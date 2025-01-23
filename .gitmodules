@@ -1,6 +1,8 @@
 [submodule "crisalid-apollo"]
 	path = crisalid-apollo
 	url = git@github.com:CRISalid-esr/crisalid-apollo.git
+	branch = dev-main
 [submodule "projects-backend"]
 	path = projects-backend
 	url = git@github.com:CyberCRI/projects-backend.git
+	branch = main
