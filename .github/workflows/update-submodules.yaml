@@ -35,7 +35,7 @@ jobs:
         git add .
 
         if ! git diff-index --quiet HEAD; then
-            git commit -m "Update submodules to latest main changes"
+            git commit -m "⬆️ submodules to latest main changes"
             git push
         else
             echo "No changes to commit"

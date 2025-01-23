@@ -1,4 +1,5 @@
 services:
+
   crisalid-apollo:
     container_name: crisalid-apollo
     build:
@@ -11,6 +12,7 @@ services:
     command: npm run dev
     env_file:
       - .env
+
   neo4j:
     image: neo4j:5-community
     container_name: neo4j
@@ -18,29 +20,41 @@ services:
       - 7474:7474
       - 7687:7687
     environment:
-      - NEO4J_AUTH=neo4j/password
+      - RESTORE_NEO4J_DUMP=${RESTORE_NEO4J_DUMP:-false}
       - NEO4J_AUTH=none
+      # - NEO4J_AUTH=neo4j/password
       - NEO4J_apoc_export_file_enabled=true
       - NEO4J_apoc_import_file_enabled=true
       - NEO4J_apoc_import_file_use__neo4j__config=true
       - NEO4JLABS_PLUGINS=["apoc"]
     volumes:
-      - neo4j-data:/data
-      - neo4j-logs:/logs
-      - neo4j-import:/import
-      - neo4j-backups:/backups
-      - neo4j-plugins:/plugins
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    ports:
-      - 5672:5672
-      - 15672:15672
-    environment:
-      RABBITMQ_DEFAULT_USER: user
-      RABBITMQ_DEFAULT_PASS: password
-    volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
+      - ./.neo4j/data:/data
+      - ./.neo4j/logs:/logs
+      - ./.neo4j/import:/import
+      - ./.neo4j/backups:/backups
+      - ./.neo4j/plugins:/plugins
+      - ./.neo4j/dumps/neo4j.dump:/neo4j.dump:ro
+    entrypoint: |
+      sh -c "
+      if [ \"$${RESTORE_NEO4J_DUMP}\" = \"true\" ]; then
+        echo 'Restoring Neo4j dump...';
+        cat /neo4j.dump | neo4j-admin database load neo4j --from-stdin --overwrite-destination=true;
+      else
+        echo 'Skipping Neo4j dump restoration';
+      fi
+      "
+
+  # rabbitmq:
+  #   image: rabbitmq:3-management
+  #   container_name: rabbitmq
+  #   ports:
+  #     - 5672:5672
+  #     - 15672:15672
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: user
+  #     RABBITMQ_DEFAULT_PASS: password
+  #   volumes:
+  #     - rabbitmq-data:/var/lib/rabbitmq
 
 #   projects-backend:
 #     container_name: projects-backend
@@ -61,6 +75,7 @@ services:
 #         - .env
 #     volumes:
 #       - ./projects-backend:/app
+
 #   postgres:
 #     image: pgvector/pgvector:pg14
 #     user: postgres
@@ -183,11 +198,6 @@ services:
 #       - 9600:9600
 
 volumes:
-  neo4j-data:
-  neo4j-logs:
-  neo4j-import:
-  neo4j-backups:
-  neo4j-plugins:
   rabbitmq-data:
   # opensearch-data:
   # projects-backend-redis:
