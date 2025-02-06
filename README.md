@@ -14,6 +14,12 @@ Run Projects backend, CRISalid Apollo server, RabbitMQ and Neo4j graph database.
 git clone --recurse-submodules git@github.com:CyberCRI/projects-crisalid.git 
 ```
 
+### Update the submodules
+
+```bash
+git pull --recurse-submodules
+```
+
 ### Set up your environment variables
 
 ```bash
@@ -28,7 +34,7 @@ Default values that work for a local Docker container are given.
 If you run the stack for the first time, first place your `neo4j.dump` file in the `.neo4j/dumps` directory, then run one of the following commands:
 ```bash
 make local-restore  # To run the stack and restore the dump
-make build-reset    # To rebuild and run the stack and restore the dump
+make build-restore  # To rebuild and run the stack and restore the dump
 ```
 
 If you already have data in your graph, then run one of the following commands:
