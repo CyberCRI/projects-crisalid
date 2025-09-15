@@ -81,7 +81,7 @@ services:
     restart: unless-stopped
     command: uvicorn projects.asgi:application --host 0.0.0.0 --port 8000 --reload
     environment:
-      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE}
+      DJANGO_SETTINGS_MODULE: projects.settings.local
     env_file:
       - ./projects-backend/.env
     volumes:
@@ -140,7 +140,7 @@ services:
       - projects-backend
       - redis
     environment:
-      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE}
+      DJANGO_SETTINGS_MODULE: projects.settings.local
     env_file:
         - ./projects-backend/.env
 
