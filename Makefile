@@ -13,13 +13,13 @@ build:
 
 .PHONY: local-restore
 local-restore:
-	RESTORE_NEO4J_DUMP=true docker-compose up
+	RESTORE_NEO4J_DUMP=true docker compose up
 
 .PHONY: build-restore
 build-restore:
-	RESTORE_NEO4J_DUMP=true docker-compose up --build
+	RESTORE_NEO4J_DUMP=true docker compose up --build
 
 # Projects backend
-.PHONY: projects-bash
-projects-bash: 
-	docker exec -it projects-backend bash
+.PHONY: bash
+bash: 
+	docker exec -it crisalid-projects-backend bash

@@ -8,10 +8,10 @@ services:
       target: builder
     ports:
         - 4000:4000
-    restart: always
+    restart: unless-stopped
     command: npm run dev
     env_file:
-      - .env
+      - ./crisalid-apollo/.env
 
   neo4j:
     image: neo4j:5-community
@@ -24,6 +24,9 @@ services:
       - NEO4J_apoc_export_file_enabled=true
       - NEO4J_apoc_import_file_enabled=true
       - NEO4J_apoc_import_file_use__neo4j__config=true
+      - NEO4J_server_memory_heap_initial__size=2G
+      - NEO4J_server_memory_heap_max__size=4G
+      - NEO4J_server_memory_pagecache_size=3G
       - NEO4JLABS_PLUGINS=["apoc"]
     volumes:
       - ./.neo4j/data:/data
@@ -65,7 +68,7 @@ services:
   #     - rabbitmq-data:/var/lib/rabbitmq
 
   projects-backend:
-    container_name: projects-backend
+    container_name: crisalid-projects-backend
     build:
       context: ./projects-backend
       args:
@@ -75,12 +78,12 @@ services:
     depends_on:
       - postgres
       - keycloak
-    restart: always
+    restart: unless-stopped
     command: uvicorn projects.asgi:application --host 0.0.0.0 --port 8000 --reload
     environment:
       DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE}
     env_file:
-        - .env
+      - ./projects-backend/.env
     volumes:
       - ./projects-backend:/app
 
@@ -132,14 +135,14 @@ services:
   celery:
     build: ./projects-backend
     command: celery -A projects worker -B -l info
-    restart: always
+    restart: unless-stopped
     depends_on:
       - projects-backend
       - redis
     environment:
       DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE}
     env_file:
-        - .env
+        - ./projects-backend/.env
 
   mailhog:
     image: mailhog/mailhog
