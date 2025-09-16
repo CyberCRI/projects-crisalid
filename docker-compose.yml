@@ -29,19 +29,19 @@ services:
       - NEO4J_server_memory_pagecache_size=3G
       - NEO4JLABS_PLUGINS=["apoc"]
     volumes:
-      - ./.neo4j/data:/data
-      - ./.neo4j/logs:/logs
-      - ./.neo4j/import:/import
-      - ./.neo4j/backups:/backups
-      - ./.neo4j/plugins:/plugins
+      - ./crisalid-apollo/neo4j/data:/data
+      - ./crisalid-apollo/neo4j/logs:/logs
+      - ./crisalid-apollo/neo4j/import:/import
+      - ./crisalid-apollo/neo4j/backups:/backups
+      - ./crisalid-apollo/neo4j/plugins:/plugins
   
   neo4j-loader:
     image: neo4j/neo4j-admin:5-community
     container_name: neo4j-loader
     volumes:
-      - ./.neo4j/data:/data
-      - ./.neo4j/backups:/backups
-      - ./.neo4j/dumps/neo4j.dump:/neo4j.dump:ro
+      - ./crisalid-apollo/neo4j/data:/data
+      - ./crisalid-apollo/neo4j/backups:/backups
+      - ./crisalid-apollo/neo4j/dumps/neo4j.dump:/neo4j.dump:ro
     environment:
       - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
       - RESTORE_NEO4J_DUMP=${RESTORE_NEO4J_DUMP:-false}

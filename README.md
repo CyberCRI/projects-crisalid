@@ -31,7 +31,7 @@ Default values that work for a local Docker container are given.
 
 #### Neo4j setup
 
-If you run the stack for the first time, first place your `neo4j.dump` file in the `.neo4j/dumps` directory, then run one of the following commands:
+If you run the stack for the first time, first place your `neo4j.dump` file in the `crisalid-apollo/neo4j/dumps` directory, then run one of the following commands:
 ```bash
 make local-restore  # To run the stack and restore the dump
 make build-restore  # To rebuild and run the stack and restore the dump
