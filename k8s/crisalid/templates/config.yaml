@@ -1,0 +1,7 @@
+{{- $configGenerator := dict
+"config" .Values.neo4j.config
+"root" $
+"commonLabels" .Values.neo4j.commonLabels
+"name" (tpl .Values.neo4j.fullName .) }}
+
+{{- include "common.config.resources" $configGenerator}}
