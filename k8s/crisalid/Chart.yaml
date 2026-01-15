@@ -1,0 +1,11 @@
+apiVersion: v2
+appVersion: 0.1.0
+description: Deploy and manage crisalid
+name: crisalid
+type: application
+version: 1.0.0
+
+dependencies:
+- name: common
+  repository: oci://criprodprod.azurecr.io/helm
+  version: 0.3.5
