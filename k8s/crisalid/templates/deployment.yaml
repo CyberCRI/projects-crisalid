@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ tpl .Values.neo4j.fullName $ }}
+  labels:
+    {{- (tpl ($.Values.neo4j.commonLabels | toYaml ) $) | nindent 4 }}
+spec:
+  serviceName: {{ tpl .Values.neo4j.fullName $ }}
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- (tpl ($.Values.neo4j.commonLabels | toYaml ) $) | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- (tpl ($.Values.neo4j.commonLabels | toYaml ) $) | nindent 8 }}
+    spec:
+      containers:
+      - name: neo4j
+      {{- with $.Values.neo4j.image }}
+        image: {{ tpl (printf "%s/%s:%s" .repository .path .tag) $ }}
+      {{- end }}
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: {{ .Values.neo4j.httpPort }}
+            name: http
+          - containerPort: {{ .Values.neo4j.boltPort }}
+            name: bolt
+        envFrom:
+        - configMapRef:
+            name: {{ tpl .Values.neo4j.fullName $ }}
+        securityContext:
+          {{- include "common.security.containerSecurityContext.restricted" dict | nindent 10 }}
+
